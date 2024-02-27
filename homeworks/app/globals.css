@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .centerFlex {
+    @apply flex items-center justify-center;
+  }
+
+  .contentLayout {
+    @apply max-w-[1244px] mx-auto;
+  }
+
+  .rounded-tr-bl-2xl {
+    @apply rounded-tr-2xl rounded-bl-2xl;
+  }
+}
+
+@layer utilities {
+  .text-lg {
+    font-size: 18px;
+    line-height: 30px;
+  }
+  .text-balance {
+    text-wrap: balance;
+  }
+}

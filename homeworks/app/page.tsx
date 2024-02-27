@@ -23,7 +23,7 @@ export default function Home() {
         <div className="bg-primary pt-[193px]">
           <div className="max-w-[calc(100%-100px)] flex justify-end">
             <SliderLeftButton className="relative top-[221px]" />
-            <div className="flex flex-col items-center ml-[46px]">
+            <div className="flex flex-col items-center ml-[46px] justify-center">
               <Image
                 src={"/main.png"}
                 alt="coffee"
@@ -76,7 +76,7 @@ export default function Home() {
           So perhaps peopel who are genetically geared to reach to that extra cup of coffee could be boosting their
           health, as well as their productivity.
         </p>
-        <div className="max-w-[1170px] flex gap-[62px] justify-between w-full">
+        <div className="max-w-[1170px] flex gap-[62px] justify-between w-full pt-[62px]">
           <CustomerProfile />
           <CustomerComment name="john doe" describe="Sunior Designer of Lomosity" />
         </div>

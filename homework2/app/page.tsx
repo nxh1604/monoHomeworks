@@ -1,16 +1,18 @@
 "use client";
 import clsx from "clsx";
-import { ComponentProps, ComponentPropsWithoutRef, useState } from "react";
+import { ComponentProps, ComponentPropsWithoutRef, Dispatch, SetStateAction, useState } from "react";
 
 export default function Home() {
-  const [quizArray, setQuizArray] = useState([1, 2, 3, 4]);
-  const handleDeleteQuizCard = (id: number) => {
+  const [quizArray, setQuizArray] = useState([{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }]);
+  const [selectedQuiz, setSelectedQuiz] = useState<null | string | number>(null);
+  const handleDeleteQuizCard = (id: number | string) => {
     if (quizArray.length <= 2) return;
-    setQuizArray((prev) => prev.filter((item) => item !== id));
+    setQuizArray((prev) => prev.filter((item) => item.id !== id));
   };
   const handleAddQuizCard = () => {
-    setQuizArray((prev) => [...prev, prev[prev.length - 1] + 1]);
+    setQuizArray((prev) => [...prev, { id: prev[prev.length - 1].id + 1 }]);
   };
+
   return (
     <main className="bg-[#0a092d] min-h-[100vh] py-8">
       <div className="flex justify-between items-center sticky top-0 max-w-[1300px] px-10 mx-auto text-white bg-[#0a092d] p-4 pb-10 z-10">
@@ -29,8 +31,15 @@ export default function Home() {
           </div>
         </div>
         <div className="space-y-5 mt-12">
-          {quizArray.map((number, index) => (
-            <QuizCard handleDeleteQuizCard={handleDeleteQuizCard} id={number} index={index + 1} key={number} />
+          {quizArray.map((quiz, index) => (
+            <QuizCard
+              selectedQuiz={selectedQuiz}
+              setSelectedQuiz={setSelectedQuiz}
+              handleDeleteQuizCard={handleDeleteQuizCard}
+              id={quiz.id}
+              index={index + 1}
+              key={quiz.id}
+            />
           ))}
           <AddQuiz nextQuiz={quizArray.length + 1} onClick={handleAddQuizCard} />
         </div>
@@ -69,7 +78,8 @@ const LabelSubmit = ({
         },
         className
       )}
-      {...rest}>
+      {...rest}
+    >
       {children}
     </label>
   );
@@ -101,7 +111,8 @@ const Button = ({
         },
         className
       )}
-      {...rest}>
+      {...rest}
+    >
       {children}
     </label>
   );
@@ -127,7 +138,8 @@ const TitleInput = ({
           className={
             "text-xs first-letter:capitalize font-semibold peer-[:placeholder-shown]:hidden" +
             ` ${showTitleOnFocus ? "hidden peer-[:focus]:block" : ""}`
-          }>
+          }
+        >
           {title}
         </h4>
         {children}
@@ -154,17 +166,22 @@ const Textarea = ({ className, ...rest }: ComponentPropsWithoutRef<"textarea">) 
 };
 
 const QuizCard = ({
+  selectedQuiz,
   index,
   id,
   handleDeleteQuizCard,
+  setSelectedQuiz,
 }: {
-  handleDeleteQuizCard: (id: number) => void;
+  selectedQuiz: number | string | null;
+  handleDeleteQuizCard: (id: number | string) => void;
+  setSelectedQuiz: Dispatch<SetStateAction<null | number | string>>;
   id: number;
   index: number;
 }) => {
+  const [yesNoArray, setYesNoArray] = useState(["", "", ""]);
   return (
-    <div className="space-y-[2px] rounded-lg overflow-hidden">
-      <div className="flex items-center justify-between py-5 px-6 bg-slate-700 ">
+    <div className="rounded-lg overflow-hidden">
+      <div className="flex items-center justify-between py-5 px-6 bg-slate-700 mb-[2px]">
         <span>{index}</span>
         <div className="flex items-center gap-3">
           <p>Div1</p>
@@ -173,40 +190,67 @@ const QuizCard = ({
           </Button>
         </div>
       </div>
-      <div className="bg-slate-700 p-6 flex justify-between gap-6 items-end">
-        <QuizInput quizId={id} label={`thuật ngữ`} className="flex-[6] pt-3" />
-        <QuizInput quizId={id} label={"định nghĩa"} className="flex-[5] pt-5" />
-        <label
-          htmlFor={`file-${index}`}
-          className="group w-[84px] h-[60px] border-dashed border-2 border-white self-start rounded-md flex flex-col justify-center items-center p-1 hover:cursor-pointer">
-          <span className="group-[:hover]:text-yellow-400">icon</span>
-          <span className="text-[10px] uppercase">hình ảnh</span>
-        </label>
-        <input id={`file-${index}`} hidden />
+      <div onClick={() => setSelectedQuiz(id)} className="bg-slate-700 p-6 flex justify-between gap-12 items-end">
+        <QuizInput quizId={id} label={`thuật ngữ`} className="flex-1 pt-3" />
+        <div className="flex-1 flex items-center gap-6">
+          <QuizInput quizId={id} label={"định nghĩa"} className="flex-[5] pt-5" />
+          <label
+            htmlFor={`file-${index}`}
+            className="group w-[84px] h-[60px] border-dashed border-2 border-white self-start rounded-md flex flex-col justify-center items-center p-1 hover:cursor-pointer"
+          >
+            <span className="group-[:hover]:text-yellow-400">icon</span>
+            <span className="text-[10px] uppercase">hình ảnh</span>
+          </label>
+        </div>
       </div>
+      {selectedQuiz === id && (
+        <div className="bg-[#1a1d28] items-start justify-between gap-12 h-[384px] pt-10 pb-5 px-6 flex">
+          <div className="flex-1 space-y-4">
+            <h4>CÁC LỰA CHỌN ĐÁP ÁN TRẮC NGHIỆM</h4>
+            <p>Với gói đăng ký Quizlet Plus, bạn có thể thêm đáp án trắc nghiệm cho các câu hỏi.</p>
+            <p>
+              Các tùy chọn bổ sung này sẽ xuất hiện dưới dạng các đáp án trắc nghiệm gây nhiễu, được sắp xếp ngẫu nhiên trong chế độ Học và Kiểm tra
+              để giúp bạn không chỉ ghi nhớ đơn thuần.
+            </p>
+            <p>Xóa các lựa chọn</p>
+          </div>
+          <div className="flex-1 flex flex-col gap-10">
+            {yesNoArray.map((each, index) => (
+              <QuizInput
+                key={`${index} ${id}`}
+                option={false}
+                label="lựa chọn đáp án"
+                placeholder={"nhập lựa chọn trắc nghiệm " + (index + 1)}
+                quizId={`${index} ${id}`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 const QuizInput = ({
   quizId,
+  option = true,
   label,
   className,
   ...rest
-}: { quizId: number; label: string } & ComponentPropsWithoutRef<"input">) => {
+}: { option?: boolean; quizId: number | string; label: string } & ComponentPropsWithoutRef<"input">) => {
   return (
     <div className={className}>
       <input
         id={label + ` ${quizId}`}
-        className="w-full bg-transparent shadow-[0_2px_0_0_white] outline-none focus:shadow-[0_4px_0_0_#ffcd1f]"
+        className="w-full bg-transparent pb-1 shadow-[0_2px_0_0_white] outline-none focus:shadow-[0_4px_0_0_#ffcd1f] placeholder:capitalize"
         {...rest}
         type="text"
       />
-      <div className="mt-2 flex justify-between text-[12px] uppercase font-[500]">
+      <div className="mt-2 flex justify-between text-[12px] uppercase font-[500] pt-1">
         <label className="pr-4" htmlFor={label + ` ${quizId}`}>
           {label}
         </label>
-        <p className="text-[#3ccfcf]">Option</p>
+        {option && <p className="text-[#3ccfcf]">Option</p>}
       </div>
     </div>
   );

@@ -46,9 +46,21 @@ const formSchema: ZodType<FormDataType> = z
             answer: z.string().optional(),
             choices: z.string().optional().array().max(3),
           })
-          .refine((data) => (data.question && data.answer) || (!data.question && !data.answer), {
-            message: "Câu hỏi phải đi kèm với đáp án và ngược lại",
-            path: ["answer"],
+          .superRefine((data, ctx) => {
+            if (data.question && !data.answer) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Câu hỏi phải có câu trả lời",
+                path: ["answer"],
+              });
+            }
+            if (!data.question && data.answer) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Câu trả lời phải có câu hỏi",
+                path: ["question"],
+              });
+            }
           })
       )
       .min(2),

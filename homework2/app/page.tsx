@@ -113,7 +113,7 @@ export default function Home() {
   };
 
   const submitData = (data: FormDataType) => {
-    console.log("magic: ", data);
+    console.log("submitData: ", data);
   };
 
   const errorsSubmmitData: SubmitErrorHandler<FormDataType> = (data) => {
